@@ -11,14 +11,14 @@ class Contenedor {
     if (this.productos.length == 1) {
       fs.promises
         .writeFile(this.name)
-        .then(() => {
+        .then((content) => {
           return obj.id
         })
         .catch((error) => console.log(`Unable to add to file, error: ${error}`))
     } else {
       fs.promises
         .appendFile(this.name, obj)
-        .then(() => {
+        .then((content) => {
           return obj.id
         })
         .catch((error) => console.log(`Unable to add to file, error: ${error}`))
@@ -42,7 +42,9 @@ class Contenedor {
     productos = productos.filter((obj) => obj.id != id)
     fs.promises
       .writeFile(this.name)
-      .then(() => console.log(`Object with id : ${id} was deleted from file`))
+      .then((content) =>
+        console.log(`Object with id : ${id} was deleted from file`)
+      )
       .catch((error) =>
         console.log(`Unable to delete from file, error: ${error}`)
       )
@@ -51,13 +53,13 @@ class Contenedor {
   deleteAll() {
     fs.promises
       .truncate(this.name, 0)
-      .then(() => {
-        console.log("Se borraron todos los elementos del archivo")
+      .then((content) => {
+        console.log("All elements from this file where deleted")
         productos = []
       })
       .catch((error) =>
         console.log(
-          `Ocurrió el siguiente error borrando los elementos del archivo: ${error}`
+          `The following error ocurred while trying to delete all: ${error}`
         )
       )
   }
