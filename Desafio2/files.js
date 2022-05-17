@@ -10,14 +10,14 @@ class Contenedor {
     this.productos.push(obj)
     if (this.productos.length == 1) {
       fs.promises
-        .writeFile(this.name)
+        .writeFile(this.name, JSON.stringify(obj, null, "\t"))
         .then((content) => {
           return obj.id
         })
         .catch((error) => console.log(`Unable to add to file, error: ${error}`))
     } else {
       fs.promises
-        .appendFile(this.name, obj)
+        .appendFile(this.name, JSON.stringify(obj, null, "\t"))
         .then((content) => {
           return obj.id
         })
@@ -31,7 +31,7 @@ class Contenedor {
 
   getById(id) {
     try {
-      const obj = productos.find((obj) => obj.id == id)
+      const obj = this.productos.find((obj) => obj.id == id)
       return obj
     } catch (error) {
       console.log(`Unable to find object with id : ${id}, error : ${error}`)
@@ -39,9 +39,9 @@ class Contenedor {
   }
 
   deleteById(id) {
-    productos = productos.filter((obj) => obj.id != id)
+    this.productos = this.productos.filter((obj) => obj.id != id)
     fs.promises
-      .writeFile(this.name)
+      .writeFile(this.name, JSON.stringify(this.productos, null, "\t"))
       .then((content) =>
         console.log(`Object with id : ${id} was deleted from file`)
       )
@@ -55,7 +55,7 @@ class Contenedor {
       .truncate(this.name, 0)
       .then((content) => {
         console.log("All elements from this file where deleted")
-        productos = []
+        this.productos = []
       })
       .catch((error) =>
         console.log(
@@ -64,3 +64,23 @@ class Contenedor {
       )
   }
 }
+
+file = new Contenedor("./productos.txt")
+
+file.save({
+  title: "Buzo",
+  price: 400.56,
+  thumbnail:
+    "https://vivasmoda.com.ar/productos/buzo-national-friza/?variant=466808371",
+})
+
+file.save({
+  title: "Remera",
+  price: 40.56,
+  thumbnail:
+    "https://vivasmoda.com.ar/productos/remera-media-polera-m-l/?variant=465981160",
+})
+console.log(file.getById(1))
+file.deleteById(1)
+console.log(file.getAll())
+file.deleteAll()
