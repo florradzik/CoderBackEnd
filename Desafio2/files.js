@@ -1,86 +1,70 @@
 const fs = require("fs")
+
 class Contenedor {
-  constructor(name) {
-    this.name = name
-    this.productos = []
+  constructor(filename) {
+    console.log("Init Contenedor")
+    this.filename = filename
+    this.data = []
+
+    try {
+      this.read()
+    } catch (e) {
+      console.log("No se encontro elarchivo")
+      console.log("Creando uno nuevo")
+      console.log(e)
+      this.write()
+    }
+  }
+
+  write() {
+    fs.promises.write
+    fs.writeFileSync(this.filename, JSON.stringify(this.data))
+  }
+  read() {
+    fs.promises
+      .readFile(this.filename)
+      .then((data) => {
+        this.data = JSON.parse(data)
+        console.log("Data loaded!")
+      })
+      .catch((e) => console.log(e))
+  }
+
+  getLastID() {
+    const l = this.data.length
+
+    if (l < 1) return 0
+
+    return this.data[this.data.length - 1].id
   }
 
   save(obj) {
-    obj = { ...obj, id: this.productos.length + 1 }
-    this.productos.push(obj)
-    if (this.productos.length == 1) {
-      fs.promises
-        .writeFile(this.name, JSON.stringify(obj, null, "\t"))
-        .then((content) => {
-          return obj.id
-        })
-        .catch((error) => console.log(`Unable to add to file, error: ${error}`))
-    } else {
-      fs.promises
-        .appendFile(this.name, JSON.stringify(obj, null, "\t"))
-        .then((content) => {
-          return obj.id
-        })
-        .catch((error) => console.log(`Unable to add to file, error: ${error}`))
-    }
+    const id = this.getLastID()
+    this.data.push({
+      ...obj,
+      ...{ id: id + 1 },
+    })
+    this.write()
+  }
+
+  getByID(id) {
+    return this.data.find((p) => p.id == id)
   }
 
   getAll() {
-    return this.productos
-  }
-
-  getById(id) {
-    try {
-      const obj = this.productos.find((obj) => obj.id == id)
-      return obj
-    } catch (error) {
-      console.log(`Unable to find object with id : ${id}, error : ${error}`)
-    }
+    return this.data
   }
 
   deleteById(id) {
-    this.productos = this.productos.filter((obj) => obj.id != id)
-    fs.promises
-      .writeFile(this.name, JSON.stringify(this.productos, null, "\t"))
-      .then((content) =>
-        console.log(`Object with id : ${id} was deleted from file`)
-      )
-      .catch((error) =>
-        console.log(`Unable to delete from file, error: ${error}`)
-      )
+    const idx = this.data.findIndex((p) => p.id == id)
+    this.data.splice(idx, 1)
+    this.write()
   }
 
   deleteAll() {
-    fs.promises
-      .truncate(this.name, 0)
-      .then((content) => {
-        console.log("All elements from this file where deleted")
-        this.productos = []
-      })
-      .catch((error) =>
-        console.log(
-          `The following error ocurred while trying to delete all: ${error}`
-        )
-      )
+    this.data = []
+    this.write()
   }
 }
 
-file = new Contenedor("./productos.txt")
-
-file.save({
-  title: "Buzo",
-  price: 400.56,
-  thumbnail:
-    "https://vivasmoda.com.ar/productos/buzo-national-friza/?variant=466808371",
-})
-
-file.save({
-  title: "Remera",
-  price: 40.56,
-  thumbnail:
-    "https://vivasmoda.com.ar/productos/remera-media-polera-m-l/?variant=465981160",
-})
-console.log(file.getById(1))
-file.deleteById(1)
-console.log(file.getAll())
-file.deleteAll()
+module.exports = Contenedor
