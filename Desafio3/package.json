@@ -1,0 +1,14 @@
+{
+    "name": "desafio3",
+    "version": "1.0.0",
+    "description": "",
+    "main": "server2.js",
+    "scripts": {
+        "start": "node servidor.js"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "express": "^4.18.1"
+    }
+}
