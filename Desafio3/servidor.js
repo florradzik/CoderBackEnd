@@ -1,4 +1,36 @@
+const { response } = require("express")
 const express = require("express")
+const Contenedor = require("./files.js")
+
+const container = new Contenedor("file.json")
+
+container.save({
+  title: "Buzo",
+  price: 400.56,
+  thumbnail:
+    "https://vivasmoda.com.ar/productos/buzo-national-friza/?variant=466808371",
+})
+
+container.save({
+  title: "Remera",
+  price: 40.56,
+  thumbnail:
+    "https://vivasmoda.com.ar/productos/remera-media-polera-m-l/?variant=465981160",
+})
+
+container.save({
+  title: "Remera",
+  price: 40.56,
+  thumbnail:
+    "https://vivasmoda.com.ar/productos/remera-media-polera-m-l/?variant=465981160",
+})
+
+container.save({
+  title: "Remera",
+  price: 40.56,
+  thumbnail:
+    "https://vivasmoda.com.ar/productos/remera-media-polera-m-l/?variant=465981160",
+})
 
 const app = express()
 
@@ -12,11 +44,12 @@ app.get("/", (request, response) => {
   response.send({ msn: "Hola Flor" })
 })
 
-app.get("/products", (request, response) => {
-  response.send([
-    { name: "beer", price: 120 },
-    { name: "wine", price: 200 },
-  ])
+app.get("/productos", (request, response) => {
+  response.send(container.getAll())
+})
+
+app.get("/productoRandom", (request, response) => {
+  response.send(container.getByRandom())
 })
 
 server.on("error", (error) => console.log("Error on server", error))

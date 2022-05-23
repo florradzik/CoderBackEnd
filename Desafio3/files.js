@@ -51,6 +51,11 @@ class Contenedor {
     return this.data.find((p) => p.id == id)
   }
 
+  getByRandom() {
+    let index = Math.round(Math.random() * this.data.length())
+    return this.data[index]
+  }
+
   getAll() {
     return this.data
   }
