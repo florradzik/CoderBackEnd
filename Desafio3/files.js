@@ -52,7 +52,7 @@ class Contenedor {
   }
 
   getByRandom() {
-    let index = Math.round(Math.random() * this.data.length())
+    let index = Math.round(Math.random() * this.data.length)
     return this.data[index]
   }
 
