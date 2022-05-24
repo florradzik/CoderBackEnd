@@ -2,7 +2,7 @@
     "name": "desafio3",
     "version": "1.0.0",
     "description": "",
-    "main": "server2.js",
+    "main": "servidor.js",
     "scripts": {
         "start": "node servidor.js"
     },
