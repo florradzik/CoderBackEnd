@@ -2,7 +2,7 @@
     "name": "desafio3",
     "version": "1.0.0",
     "description": "",
-    "main": "servidor.js",
+    "main": "router.js",
     "scripts": {
         "start": "node router.js"
     },
