@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
+    <title>Document</title>
+</head>
+<body>
+    <h1> Ingrese datos </h1>
+<div class="row">
+    <form action="/personas" method="post"> 
+        <input name="name">
+        <input name="lastname">
+        <input type="number" name="age">
+
+        <button type="submit">Guardar</button>
+
+    </form>
+
+</div>
+<div class="row"></div>
+    <h2>Historial</h2>
+    <% if(personas.length == 0) { %>
+        No se encontraron datos
+    <% } else { %>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Apellido</th> 
+                    <th scope="col">Edad</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% personas.forEach(persona => { %>
+                    <tr>
+                        <td scope="row"><%= persona.name %> </td>
+                        <td><%= persona.lastname %> </td>
+                        <td><%= persona.age %> </td>
+                    </tr>
+
+
+               <%  }); %>
+            </tbody>
+        </table>
+        <% } %>
+</body>
+</html>
