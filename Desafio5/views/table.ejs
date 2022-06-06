@@ -1,0 +1,30 @@
+<%- include( 'templates/head' ) %>
+<body>
+    <%- include( 'templates/navbar' ) %>
+    <h2>Vista de Productos</h2>
+    <% if(personas.length == 0) { %>
+        No se encontraron productos
+    <% } else { %>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Precio</th> 
+                    <th scope="col">Imagen</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% productos.forEach(producto => { %>
+                    <tr>
+                        <td scope="row"><%= producto.name %> </td>
+                        <td><%= producto.price %> </td>
+                        <td><img src= <%= producto.img %>  alt=<%= producto.name %>></td>
+                    </tr>
+
+
+               <%  }); %>
+            </tbody>
+        </table>
+        <% } %>
+</body>
+</html>
