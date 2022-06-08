@@ -3,10 +3,10 @@
     <%- include( 'templates/navbar' ) %>
     <h1> Ingrese datos de su producto</h1>
 <div class="row">
-    <form action="/personas" method="post"> 
+    <form action="/api/products" method="POST"> 
         <input name="name">
         <input name="price">
-        <input type="url" name="img">
+        <input name="img">
 
         <button type="submit">Guardar</button>
 

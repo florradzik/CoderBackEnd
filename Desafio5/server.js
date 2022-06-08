@@ -17,8 +17,12 @@ app.get("/", (req, res) => {
 // Espacio donde se encuentran todos los productos
 router.post("/", (req, res) => {
   productos.push(req.body)
-  console.log(req.body, "added to personas")
-  res.render("table", { personas })
+  console.log(req.body, "added to productos")
+  res.render("table", { productos })
+})
+
+router.get("/", (req, res) => {
+  res.render("table", { productos })
 })
 
 app.use("/api/products", router)
