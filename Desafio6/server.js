@@ -2,7 +2,7 @@ const express = require("express")
 const http = require("http")
 const { DateTime } = require("luxon")
 const { Server } = require("socket.io")
-
+const Contenedor = require("./contenedor")
 const app = express()
 const server = http.createServer(app)
 const io = new Server(httpServer)
@@ -13,11 +13,8 @@ app.use(express.static("./public"))
 app.set("views", "./views")
 app.set("view engine", "ejs")
 
-const products = []
-const messages = []
-
-const fileProducts = "products.json"
-const fileMessages = "messages.json"
+contenedorProductos = new Contenedor("products.json")
+contenedorMessages = new Contenedor("messages.json")
 
 app.get("/", (req, res) => {
   res.render("index")
@@ -25,23 +22,23 @@ app.get("/", (req, res) => {
 
 app.post("/", (req, res) => {
   console.log(req.body)
-  products.push(req.body)
+  contenedorProductos.save(data)
   res.json(req.body)
 })
 
 app.get("/products", (req, res) => {
-  res.render("products", { products })
+  res.render("products", { products: contenedorProductos.getAll() })
 })
 
 app.get("/messages", (req, res) => {
-  res.render("messages", { messages })
+  res.render("messages", { messages: contenedorMessages.getAll() })
 })
 
 io.on("connection", (socket) => {
   socket.on("add", (data) => {
     console.log(data)
-    products.push(data)
-    io.socket.emit("show", products)
+    contenedorProductos.save(data)
+    io.socket.emit("show", { products: contenedorProductos.getAll() })
   })
 
   socket.on("chat-in", (data) => {
