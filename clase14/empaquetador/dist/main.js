@@ -1,0 +1,1 @@
+setTimeout((()=>console.log("Hola")),300),console.log("Hola2");
