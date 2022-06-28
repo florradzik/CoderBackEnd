@@ -15,42 +15,61 @@ class Contenedor {
       .catch((e) => console.log(e))
   }
 
-  getLastID() {
-    const l = this.data.length
-
-    if (l < 1) return 0
-
-    return this.data[this.data.length - 1].id
-  }
-
   save(obj) {
     // insertar
-    const id = this.getLastID()
-    this.data.push({
-      ...obj,
-      ...{ id: id + 1 },
-    })
-    this.write()
+    const knex = require("knex")(this.dbOptions)
+    knex(this.table)
+      .insert(obj)
+      .then(() => console.log("data inserted"))
+      .catch((err) => console.log(err))
+      .finally(() => knex.destroy())
   }
 
   getByID(id) {
     //select
-    return this.data.find((p) => p.id == id)
+    const knex = require("knex")(this.dbOptions)
+    knex
+      .from(this.table)
+      .select("*")
+      .where("id", "=", id)
+      .then((rows) => {
+        return rows
+      })
+      .catch((err) => console.log(err))
+      .finally(() => knex.destroy())
   }
 
   getAll() {
-    return this.data
+    const knex = require("knex")(this.dbOptions)
+    knex
+      .from(this.table)
+      .select("*")
+      .then((rows) => {
+        return rows
+      })
+      .catch((err) => console.log(err))
+      .finally(() => knex.destroy())
   }
 
   deleteById(id) {
-    const idx = this.data.findIndex((p) => p.id == id)
-    this.data.splice(idx, 1)
-    this.write()
+    const knex = require("knex")(options)
+    knex
+      .from(this.table)
+      .where("age", "=", id)
+      .del()
+      .then(() => console.log("data deleted"))
+      .catch((err) => console.log(err))
+      .finally(() => knex.destroy())
   }
 
   deleteAll() {
-    this.data = []
-    this.write()
+    const knex = require("knex")(options)
+    knex
+      .from(this.table)
+      .del()
+      .then(() => console.log("data deleted"))
+      .catch((err) => console.log(err))
+      .finally(() => knex.destroy())
   }
 }
 
