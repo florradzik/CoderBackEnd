@@ -6,13 +6,15 @@ class Contenedor {
 
   read() {
     // seleccionar todo
-    fs.promises
-      .readFile(this.filename)
-      .then((data) => {
-        this.data = JSON.parse(data)
-        console.log("Data loaded!")
+    const knex = require("knex")(this.dbOptions)
+    knex
+      .from(this.table)
+      .select("*")
+      .then((rows) => {
+        return rows
       })
-      .catch((e) => console.log(e))
+      .catch((err) => console.log(err))
+      .finally(() => knex.destroy())
   }
 
   save(obj) {
