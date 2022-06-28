@@ -10,8 +10,9 @@ const knex = require("knex")(options)
 knex.schema
   .createTable("messages", (table) => {
     table.increments("id", { primaryKey: true })
-    table.string("user")
-    table.string("content")
+    table.string("username")
+    table.string("msg")
+    table.string("date")
   })
   .then(() => console.log("table created"))
   .catch((err) => {
