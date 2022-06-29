@@ -1,10 +1,10 @@
 const express = require("express")
 const http = require("http")
 const { Server } = require("socket.io")
-const Contenedor = require("./contenedor")
+const Contenedor = require("./container")
 const app = express()
 const server = http.createServer(app)
-const io = new Server(httpServer)
+const io = new Server(server)
 const PORT = process.env.PORT || 8080
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
