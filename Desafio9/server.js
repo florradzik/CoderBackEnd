@@ -45,8 +45,8 @@ const schemaAllMessages = new schema.Entity(
   }
 )
 
-const messagesJson = new Contenedor("./modules/messages/messages.json")
-const productsJson = new Contenedor("./modules/products/file.json")
+const messagesJson = new Contenedor("messages.json")
+const productsJson = new Contenedor("products.json")
 
 app.get("/", async (request, resolve) => {
   const messages = await messagesJson.getAll()
