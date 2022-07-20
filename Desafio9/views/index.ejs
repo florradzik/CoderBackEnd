@@ -1,0 +1,38 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="/styles/styles.css" type="text/css" />
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/normalizr@3.6.1/dist/normalizr.browser.min.js"></script>
+        <script defer src="/public/index.js"></script>
+        <title>Desafio9</title>
+      </head>
+<body>
+    <h2 id="username">
+    </h2>
+    <hr>
+    <form>
+        <input id="item" name="item"/>
+        <input id="price" name="price"/>
+        <input id="url" name="url"/>
+        <button id="load" > Cargar </button>
+    </form>
+    <div id="products"></div>
+    <div id="messages"></div>
+    <div>
+        <form id="form" class="formChat">
+            <input type="text" name="name" id="name" placeholder="Nombre" />
+            <input type="email" name="email" id="email" placeholder="Email" />
+            <input type="number" name="age" id="age" placeholder="Edad" />
+            <input type="text" name="avatar" id="avatar" placeholder="Avatar" />
+            <input type="text" name="text" id="text" placeholder="Mensaje" />
+            <input id="send" type="submit" value="Enviar" />
+        </form>
+    </div>
+        
+</body>
+</html>
