@@ -1,0 +1,68 @@
+const express = require("express")
+const http = require("http")
+const { Server } = require("socket.io")
+const app = express()
+const httpServer = http.createServer(app)
+
+//sessions
+const session = require("express-session")
+const MongoStore = require("connect-mongo")
+
+//import hojas de ruta
+const productsRoutes = require("./routes/products.routes")
+const productsRoutesTest = require("./routes/productsTest.routes")
+
+//sockets. Contenedor de msg
+const io = new Server(httpServer)
+const mensajes = require("./controllers/MensajesContainer")
+
+//Settings
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+app.use(express.static("./public"))
+app.use(
+  session({
+    store: new MongoStore({
+      mongoUrl: "mongodb://localhost/sessions",
+    }),
+    secret: "turing",
+    resave: false,
+    saveUninitialized: false,
+    cookie: { maxAge: 60000 * 10 },
+  })
+)
+
+//view engine:
+app.set("view engine", "ejs")
+app.set("views", __dirname + "/views")
+
+//websockets:
+io.on("connection", (socket) => {
+  console.log("Usuario conectado, ID: " + socket.id)
+
+  mensajes.getAll().then((messages) => {
+    socket.emit("messages", messages)
+  })
+
+  socket.on("newMessage", (newMessage) => {
+    mensajes
+      .newMessage(newMessage)
+      .then(() =>
+        mensajes
+          .getAll()
+          .then((messages) => io.sockets.emit("messages", messages))
+      )
+  })
+})
+
+//Routes
+app.use("/", productsRoutes)
+app.use("/api/productos-test", productsRoutesTest)
+app.get("/*", (req, res) => {
+  res.json({
+    error: -2,
+    msg: "Ruta no implementada.",
+  })
+})
+
+module.exports = httpServer
