@@ -2,6 +2,9 @@
 <nav class="navbar navbar-expand-lg bg-light">
   <div class="container-fluid">
     <a class="navbar-brand me-5" href="/">Página de productos</a>
+    <a href="/auth/login">
+      <button type="button" class="btn btn-success me-4">Ingresar</button>
+    </a>
     <button
       class="navbar-toggler"
       type="button"
@@ -16,17 +19,11 @@
   </div>
 </nav>
 
-<% if ( username != ''){ %>
-<div
-  class="alert alert-success m-auto p-3"
-  style="display: flex; justify-content: space-between"
-  role="alert"
->
-  <h4 class="text-primary">Hasta la próxima <%= username %></h4>
-  <button type="button" class="btn btn-danger">
-    <a href="/auth/login" style="text-decoration: none; color: white"
-      >Volver a ingresar</a
-    >
-  </button>
+<div class="alert alert-danger w-50 m-auto mt-4" role="alert">
+  <h4 class="alert-heading">Error en el Login</h4>
+  <p>Es posible que hayas escrito mal tu usuario y/o contraseña. Intentalo de vuelta!.</p>
+  <hr>
+  <a href="/auth/login">
+    <button type="button" class="btn btn-success me-4">Intentar de nuevo</button>
+  </a>
 </div>
-<% } %>

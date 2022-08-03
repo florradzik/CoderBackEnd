@@ -3,18 +3,22 @@ const http = require("http")
 const { Server } = require("socket.io")
 const app = express()
 const httpServer = http.createServer(app)
-
-//sessions
 const session = require("express-session")
-const MongoStore = require("connect-mongo")
+const passport = require("passport")
+const LocalStrategy = require("passport-local").Strategy
+const bcryptjs = require("bcryptjs")
 
-//import hojas de ruta
+//User model
+const User = require("./models/User.model")
+
+//Routes
 const productsRoutes = require("./routes/products.routes")
-const productsRoutesTest = require("./routes/productsTest.routes")
+const authRoutes = require("./routes/auth.routes")
 
-//sockets. Contenedor de msg
+//sockets.
 const io = new Server(httpServer)
-const mensajes = require("./controllers/MensajesContainer")
+const socketsMsg = require("./websockets/messages.sockets")
+io.on("connection", socketsMsg)
 
 //Settings
 app.use(express.json())
@@ -22,13 +26,15 @@ app.use(express.urlencoded({ extended: true }))
 app.use(express.static("./public"))
 app.use(
   session({
-    store: new MongoStore({
-      mongoUrl: "mongodb://localhost/sessions",
-    }),
     secret: "turing",
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 60000 * 10 },
+    rolling: true,
+    cookie: {
+      maxAge: 60000 * 10,
+      secure: false,
+      httpOnly: true,
+    },
   })
 )
 
@@ -36,28 +42,58 @@ app.use(
 app.set("view engine", "ejs")
 app.set("views", __dirname + "/views")
 
-//websockets:
-io.on("connection", (socket) => {
-  console.log("Usuario conectado, ID: " + socket.id)
+//passport
+passport.use(
+  "login",
+  new LocalStrategy(async (username, password, done) => {
+    const user = await User.findOne({ username })
+    if (!user) {
+      return done(null, false)
+    }
+    const validPasswd = bcryptjs.compareSync(password, user.password)
+    if (!validPasswd) {
+      return done(null, false)
+    }
 
-  mensajes.getAll().then((messages) => {
-    socket.emit("messages", messages)
+    return done(null, user)
   })
+)
 
-  socket.on("newMessage", (newMessage) => {
-    mensajes
-      .newMessage(newMessage)
-      .then(() =>
-        mensajes
-          .getAll()
-          .then((messages) => io.sockets.emit("messages", messages))
-      )
-  })
+passport.use(
+  "singup",
+  new LocalStrategy(
+    { passReqToCallback: true },
+    async (req, username, password, done) => {
+      const user = await User.findOne({ username })
+      if (user) {
+        return done(null, false)
+      }
+
+      const newUser = { username, password }
+      //Encriptar la PW:
+      const salt = bcryptjs.genSaltSync()
+      newUser.password = bcryptjs.hashSync(newUser.password, salt)
+
+      await User.create(newUser)
+      return done(null, newUser)
+    }
+  )
+)
+
+passport.serializeUser(function (user, done) {
+  done(null, user)
 })
+
+passport.deserializeUser(function (user, done) {
+  done(null, user)
+})
+
+app.use(passport.initialize())
+app.use(passport.session())
 
 //Routes
 app.use("/", productsRoutes)
-app.use("/api/productos-test", productsRoutesTest)
+app.use("/auth", authRoutes)
 app.get("/*", (req, res) => {
   res.json({
     error: -2,
