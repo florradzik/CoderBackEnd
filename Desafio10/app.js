@@ -7,6 +7,7 @@ const session = require("express-session")
 const passport = require("passport")
 const LocalStrategy = require("passport-local").Strategy
 const bcryptjs = require("bcryptjs")
+require("dotenv").config()
 
 //User model
 const User = require("./models/User.model")
@@ -14,6 +15,7 @@ const User = require("./models/User.model")
 //Routes
 const productsRoutes = require("./routes/products.routes")
 const authRoutes = require("./routes/auth.routes")
+const randomRoutes = require("./routes/random.routes")
 
 //sockets.
 const io = new Server(httpServer)
@@ -94,9 +96,21 @@ app.use(passport.session())
 //Routes
 app.use("/", productsRoutes)
 app.use("/auth", authRoutes)
-app.get("/*", (req, res) => {
+app.use("/api/randoms", randomRoutes)
+//Rutas para el desafio de variables globales:
+app.get("/info", (req, res) => {
   res.json({
-    error: -2,
+    "Argumentos de entrada": process.argv,
+    "Nombre de la plataforma": process.platform,
+    "Versión de node": process.version,
+    "Memoria total reservada": process.memoryUsage(),
+    "Path de ejecución": process.execPath,
+    "Process ID": process.pid,
+    "Carpeta del proyecto": process.cwd(),
+  })
+})
+app.get("/*", (req, res) => {
+  res.status(404).json({
     msg: "Ruta no implementada.",
   })
 })
