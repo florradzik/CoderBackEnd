@@ -7,7 +7,30 @@ const session = require("express-session")
 const passport = require("passport")
 const LocalStrategy = require("passport-local").Strategy
 const bcryptjs = require("bcryptjs")
+const compression = require("compression")
 require("dotenv").config()
+
+//===================LOG4JS===================================
+const log4js = require("log4js")
+
+log4js.configure({
+  appenders: {
+    myLoggerConsole: { type: "console" },
+    myLoggerFileWarn: { type: "file", filename: "warn.log" },
+    myLoggerFileError: { type: "file", filename: "error.log" },
+  },
+  categories: {
+    default: { appenders: ["myLoggerConsole"], level: "info" },
+    info: { appenders: ["myLoggerConsole"], level: "info" },
+    warn: { appenders: ["myLoggerConsole", "myLoggerFileWarn"], level: "warn" },
+    error: {
+      appenders: ["myLoggerConsole", "myLoggerFileError"],
+      level: "error",
+    },
+  },
+})
+
+//===================LOG4JS===================================
 
 //User model
 const User = require("./models/User.model")
