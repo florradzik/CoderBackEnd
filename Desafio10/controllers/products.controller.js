@@ -1,46 +1,49 @@
-const options = require("../db/options/optionsMysql")
-const knex = require("knex")(options)
-const log4js = require("log4js")
+const { logger, loggErrorFile, loggWarningFile } = require("../helpers/logger")
 
-const createProductsTable = () => {
-  knex.schema
-    .createTable("productos", (table) => {
-      table.string("title"),
-        table.integer("price"),
-        table.string("thumbnail"),
-        table.increments("id")
-    })
-    .then(() => console.log("Table created"))
-    .catch((error) => console.log(error))
-}
+//Models:
+const Products = require("../models/Product.model")
+const Users = require("../models/User.model")
 
 const getAllProducts = async (req, res) => {
   try {
-    const logger = log4js.getLogger("info")
+    //Log4js
     logger.info(`${req.method}: ${req.url}`)
-    req.session.touch()
-    const products = await knex.from(options.connection.table).select("*")
 
-    return res.render("productos", { products: products })
+    req.session.touch()
+    let { username } = req.session.passport.user
+    const user = await Users.findOne({ username })
+
+    const { type, sort } = req.query
+    const query = {
+      where: { state: 1 },
+    }
+
+    if (type) query.where.type = type
+    if (sort) query.order = [["price", sort]]
+
+    const products = await Products.findAll(query)
+    const count = await Products.count(query)
+
+    return res.render("productos", { products, user, type, count })
+    // return res.json({ count, products })
   } catch (error) {
-    const logger = log4js.getLogger("error")
-    logger.error(`${req.method}: ${req.url} + ${error}`)
+    loggErrorFile.error(`${req.method}: ${req.url} + ${error}`)
   }
 }
 
 const getProductById = async (req, res) => {
   try {
-    const logger = log4js.getLogger("info")
+    //Log4js
     logger.info(`${req.method}: ${req.url}`)
+
     req.session.touch()
     const { id } = req.params
 
-    const product = await knex
-      .from(options.connection.table)
-      .select("*")
-      .where("id", "=", id)
+    const product = await Products.findByPk(id, {
+      where: { state: true },
+    })
 
-    if (product.length < 1) {
+    if (!product || !product.state) {
       return res.status(400).json({
         error: `Producto con ID: ${id} no encotrado.`,
       })
@@ -48,37 +51,37 @@ const getProductById = async (req, res) => {
 
     return res.json({ product })
   } catch (error) {
-    const logger = log4js.getLogger("error")
-    logger.error(`${req.method}: ${req.url} + ${error}`)
+    loggErrorFile.error(`${req.method}: ${req.url} + ${error}`)
   }
 }
 
 const newProduct = async (req, res) => {
   try {
-    const logger = log4js.getLogger("info")
+    //Log4js
     logger.info(`${req.method}: ${req.url}`)
+
     req.session.touch()
-    await knex(options.connection.table).insert(req.body)
+
+    const { title, price, desc, img, type } = req.body
+    const newProd = await Products.create({ title, price, desc, img, type })
+
     return res.redirect("/products")
+    // res.json({ newProd })
   } catch (error) {
-    const logger = log4js.getLogger("error")
-    logger.error(`${req.method}: ${req.url} + ${error}`)
+    loggErrorFile.error(`${req.method}: ${req.url} + ${error}`)
   }
 }
 
 const updateProduct = async (req, res) => {
   try {
-    const logger = log4js.getLogger("info")
+    //Log4js
     logger.info(`${req.method}: ${req.url}`)
+
     req.session.touch()
     const { id } = req.params
+    const { title, price, desc, img, type } = req.body
 
-    const editedProd = await knex
-      .from(options.connection.table)
-      .where("id", "=", id)
-      .update(
-        req.body
-      ) /*Le pasamos un objeto con las props que vamos a actualizar*/
+    const editedProd = await Products.findByPk(id)
 
     if (!editedProd) {
       return res.status(400).json({
@@ -86,30 +89,33 @@ const updateProduct = async (req, res) => {
       })
     }
 
-    return res.json({
-      msg: "Producto actualizado.",
-    })
+    if (title) editedProd.title = title
+    if (price) editedProd.price = price
+    if (desc) editedProd.desc = desc
+    if (img) editedProd.img = img
+    if (type) editedProd.type = type
+
+    await editedProd.save()
+
+    // return res.json({
+    //   msg: "Producto actualizado.",
+    //   editedProd
+    // });
+    return res.redirect("/products")
   } catch (error) {
-    const logger = log4js.getLogger("error")
-    logger.error(`${req.method}: ${req.url} + ${error}`)
+    loggErrorFile.error(`${req.method}: ${req.url} + ${error}`)
   }
 }
 
 const deleteProduct = async (req, res) => {
   try {
-    const logger = log4js.getLogger("info")
+    //Log4js
     logger.info(`${req.method}: ${req.url}`)
+
     req.session.touch()
     const { id } = req.params
 
-    const deletedProd = await knex
-      .from(options.connection.table)
-      .where(
-        "id",
-        "=",
-        id
-      ) /* SI NO PONEMOS EL CONDICIONAL, BORRA TODA LA DATA DE LA TABLA */
-      .del()
+    const deletedProd = await Products.findByPk(id)
 
     if (!deletedProd) {
       return res.status(400).json({
@@ -117,17 +123,20 @@ const deleteProduct = async (req, res) => {
       })
     }
 
-    return res.json({
-      mesage: `Producto con ID: ${id} eliminado.`,
-    })
+    deletedProd.state = false
+
+    await deletedProd.save()
+
+    // return res.json({
+    //   mesage: `Producto con ID: ${id} eliminado.`
+    // })
+    return res.redirect("/products")
   } catch (error) {
-    const logger = log4js.getLogger("error")
-    logger.error(`${req.method}: ${req.url} + ${error}`)
+    loggErrorFile.error(`${req.method}: ${req.url} + ${error}`)
   }
 }
 
 module.exports = {
-  createProductsTable,
   getAllProducts,
   getProductById,
   newProduct,
