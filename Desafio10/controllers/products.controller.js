@@ -2,7 +2,7 @@ const { logger, loggErrorFile, loggWarningFile } = require("../helpers/logger")
 
 //Models:
 const Products = require("../models/Product.model")
-const Users = require("../models/User.model")
+const Users = require("../db/model.mongo/User.model")
 
 const getAllProducts = async (req, res) => {
   try {
