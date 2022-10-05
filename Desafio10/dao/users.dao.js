@@ -1,6 +1,6 @@
 const MongoClient = require("../db/mongoClient")
 
-class ProductDAO {
+class UserDAO {
   constructor() {
     this.client = new MongoClient()
     this.client.connect()
@@ -19,4 +19,4 @@ class ProductDAO {
   }
 }
 
-module.exports = ProductDAO
+module.exports = UserDAO
